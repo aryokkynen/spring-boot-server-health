@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Spring Boot server health checker</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.1/css/bulma.css">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+var count = 0;
+var min = 1000;
+var max = 20000;
+var serverHealthCheckUrl = "Enter here your spring boot /health endpoint";
+fetchServerStatus();
+
+function getNewIntervall(){
+    return Math.floor(Math.random() * max) + min;
+}
+
+function fetchServerStatus(){
+
+    $.getJSON(serverHealthCheckUrl ,function(json){
+     
+        var d = new Date();
+
+        if (json.status == "UP"){
+            document.getElementById('serverStatus').innerHTML = "<section class='hero is-primary is-bold'> <div class='hero-body'> <div class='container'> <h1 class='title is-1 is-large'>"+ json.status +"</h1> </div></div></section>";
+            count++;
+            document.getElementById('count').innerHTML = count;
+            document.getElementById('updateTime').innerHTML = d.toLocaleTimeString();
+        } 
+
+        else {
+
+            document.getElementById('serverStatus').innerHTML = "<section class='hero is-danger is-bold'> <div class='hero-body'> <div class='container'> <h1 class='title title is-1 is-large'>"+ json.status +"</h1> </div></div></section>"
+            count++;
+            document.getElementById('count').innerHTML = count;
+            document.getElementById('updateTime').innerHTML = d.toLocaleTimeString();
+
+        }  
+        setTimeout(fetchServerStatus, getNewIntervall());
+    });
+}
+
+});
+
+</script>
+</head>
+<body>
+<div class="container is-fluid">
+
+<div class="card is-unselectable">
+    <header class="card-header">
+        <p class="card-header-title">
+            Server status
+        </p>
+    </header>
+
+    <div class="card-content">
+    <p class="title">
+        <div id='serverStatus' class='has-text-centered'><h1></div>
+    </p>
+
+    </div>
+
+        <footer class="card-footer">
+            <p class="card-footer-item">
+                <span>
+                    Update count: <span id='count'></span>
+                </span>
+            </p>
+            <p class="card-footer-item">
+                <span>
+                    Last updated: <span id='updateTime'></span>
+                </span>
+            </p>
+        </footer>
+    </div>
+</div>
+</body>
+</html>
