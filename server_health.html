@@ -12,7 +12,7 @@ $(document).ready(function(){
 var count = 0;
 var min = 1000;
 var max = 20000;
-var serverHealthCheckUrl = "Enter here your spring boot /health endpoint";
+var serverHealthCheckUrl = "http://packlog.tk/AllRounders/debug/health";
 fetchServerStatus();
 
 function getNewIntervall(){
@@ -21,9 +21,14 @@ function getNewIntervall(){
 
 function fetchServerStatus(){
 
-    $.getJSON(serverHealthCheckUrl ,function(json){
-     
-        var d = new Date();
+
+
+    $.ajax({
+        url: serverHealthCheckUrl,
+        dataType: 'json',
+
+        success: function( json ) {
+                var d = new Date();
 
         if (json.status == "UP"){
             document.getElementById('serverStatus').innerHTML = "<section class='hero is-primary is-bold'> <div class='hero-body'> <div class='container'> <h1 class='title is-1 is-large'>"+ json.status +"</h1> </div></div></section>";
@@ -41,9 +46,20 @@ function fetchServerStatus(){
 
         }  
         setTimeout(fetchServerStatus, getNewIntervall());
+        },
+        
+        error: function( json ) {
+            var d = new Date();
+            document.getElementById('serverStatus').innerHTML = "<section class='hero is-danger is-bold'> <div class='hero-body'> <div class='container'> <h1 class='title title is-1 is-large'>Server not responding</h1> </div></div></section>"
+            count++;
+            document.getElementById('count').innerHTML = count;
+            document.getElementById('updateTime').innerHTML = d.toLocaleTimeString();
+            setTimeout(fetchServerStatus, getNewIntervall());
+        }
+        
     });
-}
 
+}
 });
 
 </script>
